@@ -1,0 +1,6 @@
+D:\Learning\VTT_SHOP_API\VTT_SHOP_SHARED\obj\Debug\net8.0\staticwebassets.build.json
+D:\Learning\VTT_SHOP_API\VTT_SHOP_SHARED\obj\Debug\net8.0\staticwebassets.build.json
+D:\Learning\VTT_SHOP_API\VTT_SHOP_SHARED\obj\Debug\net8.0\staticwebassets.build.json
+D:\Learning\VTT_SHOP_API\VTT_SHOP_SHARED\obj\Debug\net8.0\staticwebassets.build.json
+D:\Learning\VTT_SHOP_API\VTT_SHOP_SHARED\obj\Debug\net8.0\staticwebassets.build.json
+D:\Learning\VTT_SHOP_API\VTT_SHOP_SHARED\obj\Debug\net8.0\staticwebassets.build.json
