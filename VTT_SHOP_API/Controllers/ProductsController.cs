@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
+using System.Threading.Tasks;
 using VTT_SHOP_CORE.DTOs;
 using VTT_SHOP_CORE.Services;
 
@@ -15,61 +17,72 @@ namespace VTT_SHOP_API.Controllers
         {
             _product = product;
         }
-        [HttpGet("SearchProduct")]
-        public async Task<IActionResult> SearchProduct(string name)
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetProductById(long id)
         {
-            var products = await _product.SearchProductByNameAsync(name);
-            if (products.Count == 0)
+            var result = await _product.GetProductByIdAsync(id);
+            if (result.IsSuccess)
             {
-                return NotFound();
+                return Ok(result.Value);
             }
-            return Ok(products);
+            return NotFound(new { Message = result.Errors.FirstOrDefault()?.Message });
         }
 
-        [HttpPost("CreateProduct")]
+        [HttpGet("search-product")]
+        public async Task<IActionResult> SearchProduct([FromQuery] string name)
+        {
+            var result = await _product.SearchProductByNameAsync(name);
+            if (result.IsSuccess)
+            {
+                return Ok(result.Value);
+            }
+            return NotFound(new { Message = result.Errors.FirstOrDefault()?.Message });
+        }
+
+        [HttpPost("create-product")]
         public async Task<IActionResult> CreateProduct(CreateProductDTO productDTO)
         {
-            var product = await _product.AddProductAsync(productDTO);
-            if (product == null)
+            var result = await _product.AddProductAsync(productDTO);
+            if (result.IsSuccess)
             {
-                return BadRequest();
+                return CreatedAtAction(nameof(GetProductById), new { id = result.Value.Id }, result.Value);
             }
-            return Ok(product);
+            return BadRequest(new { Message = result.Errors.FirstOrDefault()?.Message });
         }
 
-        [HttpPut("UpdateProduct")]
-        public IActionResult UpdateProduct(UpdateProductDTO productDTO)
+        [HttpPut("update-product")]
+        public async Task<IActionResult> UpdateProduct(UpdateProductDTO productDTO)
         {
-            var product = _product.UpdateProduct(productDTO);
-            if (product == null)
+            var result = await _product.UpdateProductAsync(productDTO);
+            if (result.IsSuccess)
             {
-                return BadRequest();
+                return Ok(result.Value);
             }
-            return Ok(product);
+
+            return BadRequest(new { Message = result.Errors.FirstOrDefault()?.Message });
         }
 
-        [HttpDelete("DeleteProduct")]
-        public async Task<IActionResult> DeleteProduct(int id)
+        [HttpDelete("delete-product/{id}")]
+        public async Task<IActionResult> DeleteProduct(long id)
         {
-            var productIsDelete = await _product.DeleteProductAsync(id);
-            if (productIsDelete == false)
+            var result = await _product.DeleteProductAsync(id);
+            if (result.IsSuccess)
             {
-                return BadRequest();
+                return Ok(new { Message = result.Successes.FirstOrDefault()?.Message });
             }
-            return Ok();
+            return BadRequest(new { Message = result.Errors.FirstOrDefault()?.Message });
         }
 
-        [HttpGet("FilterByPrice")]
-        public async Task<IActionResult> FilterByPrice(double priceMin, double priceMax)
+        [HttpGet("filter-by-price")]
+        public async Task<IActionResult> FilterByPrice([FromQuery] double priceMin, [FromQuery] double priceMax)
         {
-            var products = await _product.FilterProductByPriceAsync(priceMin, priceMax);
-            if (products.Count == 0) 
+            var result = await _product.FilterProductByPriceAsync(priceMin, priceMax);
+            if (result.IsSuccess)
             {
-                return NotFound();
+                return Ok(result.Value);
             }
-            return Ok(products);
+            return NotFound(new { Message = result.Errors.FirstOrDefault()?.Message });
         }
-          
-
     }
 }

@@ -1,13 +1,13 @@
 {
   "Version": 1,
-  "Hash": "XcMSO2jRwBWsGRuerwqBfrex8dZkGvtIFITwN8hfAA0=",
+  "Hash": "bzsfbHptSwfZ2BHOqNCaYSME3kBVXB4IzPtG2yvVxOM=",
   "Source": "VTT_SHOP_CORE",
   "BasePath": "_content/VTT_SHOP_CORE",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [
     {
-      "Identity": "D:\\Learning\\VTT_SHOP_API\\VTT_SHOP_DATABASE\\VTT_SHOP_DATABASE.csproj",
+      "Identity": "D:\\Learning\\VTTShop\\VTT_SHOP_DATABASE\\VTT_SHOP_DATABASE.csproj",
       "Version": 2,
       "Source": "VTT_SHOP_DATABASE",
       "GetPublishAssetsTargets": "ComputeReferencedStaticWebAssetsPublishManifest;GetCurrentProjectPublishStaticWebAssetItems",
@@ -18,7 +18,7 @@
       "AdditionalBuildPropertiesToRemove": "WebPublishProfileFile;TargetFramework;RuntimeIdentifier;SelfContained"
     },
     {
-      "Identity": "D:\\Learning\\VTT_SHOP_API\\VTT_SHOP_SHARED\\VTT_SHOP_SHARED.csproj",
+      "Identity": "D:\\Learning\\VTTShop\\VTT_SHOP_SHARED\\VTT_SHOP_SHARED.csproj",
       "Version": 2,
       "Source": "VTT_SHOP_SHARED",
       "GetPublishAssetsTargets": "ComputeReferencedStaticWebAssetsPublishManifest;GetCurrentProjectPublishStaticWebAssetItems",

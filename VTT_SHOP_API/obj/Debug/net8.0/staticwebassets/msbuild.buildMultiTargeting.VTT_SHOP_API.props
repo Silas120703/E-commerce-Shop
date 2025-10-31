@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="..\build\VTT_SHOP_API.props" />
-</Project>

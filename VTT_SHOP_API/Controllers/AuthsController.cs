@@ -46,6 +46,16 @@ namespace VTT_SHOP_API.Controllers
             return BadRequest(new { Message = result.Errors.FirstOrDefault()?.Message });
 
         }
+        [HttpPost("refresh-token")]
+        public async Task<IActionResult> RefreshToken(RefreshTokenDTO refresh)
+        {
+            var result = await _userService.RefreshToken(refresh);
+            if (result.IsSuccess)
+            {
+                return Ok(result.Value);
+            }
+            return BadRequest(new { Message = result.Errors.FirstOrDefault()?.Message });
+        }
 
         [HttpPost("verify-email")]
         public async Task<IActionResult> VerifyEmail(VerifyTokenDTO token)
