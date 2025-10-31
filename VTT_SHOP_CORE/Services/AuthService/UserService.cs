@@ -120,10 +120,55 @@ namespace VTT_SHOP_CORE.Services.AuthService
             return Result.Ok(authResponse);
         }
 
-        //public async Task<Result<AuthResponseDto>> RefreshToken(RefreshToken token)
-        //{
+        public async Task<Result<AuthResponseDto>> RefreshToken(RefreshTokenDTO tokenDto)
+        {
 
-        //}
+            var oldRefreshToken = await _refresh.GetByTokenAsync(tokenDto.RefreshToken);
+            if (oldRefreshToken == null)
+            {
+                return Result.Fail("Refresh token not found.");
+            }
+            if (!oldRefreshToken.IsActive)
+            {
+                return Result.Fail("Refresh token is invalid or expired");
+            }
+            var user = await _user.GetByIdAsync(oldRefreshToken.UserId);
+            if (user == null)
+            {
+                return Result.Fail("No user associated with this refresh token found.");
+            }
+
+            try
+            {
+                await _unitOfWork.BeginTransactionAsync();
+                var newAccessToken = _jwt.GenerateAccessToken(user);
+                var newRefreshTokenString = _jwt.GenerateRefreshToken();
+                var newRefreshToken = new RefreshToken()
+                {
+                    UserId = user.Id,
+                    Token = newRefreshTokenString,
+                    ExpiryAt = DateTime.UtcNow.AddDays(7), 
+                };
+                await _refresh.AddAsync(newRefreshToken);
+
+                oldRefreshToken.RevokeAt = DateTime.UtcNow;
+                oldRefreshToken.ReplanceByToken = newRefreshToken.Token;
+                _refresh.Update(oldRefreshToken);
+                await _unitOfWork.SaveChangesAsync();
+                await _unitOfWork.CommitAsync();
+                var authResponse = new AuthResponseDto()
+                {
+                    AccessToken = newAccessToken,
+                    RefreshToken = newRefreshTokenString,
+                };
+                return Result.Ok(authResponse);
+            }
+            catch (Exception ex)
+            {
+                await _unitOfWork.RollbackAsync();
+                return Result.Fail("An error occurred while refreshing the token: " + ex.Message);
+            }
+        }
 
         public async Task<Result<UserDTO?>> VerifyTokenFromEmail(VerifyTokenDTO token)
         {
