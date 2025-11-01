@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VTT_SHOP_DATABASE;
 
@@ -11,9 +12,11 @@ using VTT_SHOP_DATABASE;
 namespace VTT_SHOP_DATABASE.Migrations
 {
     [DbContext(typeof(VTTShopDBContext))]
-    partial class VTTShopDBContextModelSnapshot : ModelSnapshot
+    [Migration("20251101074859_AddCartTableAndCartItemTable")]
+    partial class AddCartTableAndCartItemTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -2,12 +2,13 @@
 using Microsoft.AspNetCore.Mvc;
 using VTT_SHOP_CORE.DTOs;
 using VTT_SHOP_CORE.Services;
+using VTT_SHOP_SHARED.Services;
 
 namespace VTT_SHOP_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProductsController : ControllerBase
+    public class ProductsController : ApiControllerBase
     {
         private readonly ProductService _product;
 
@@ -60,7 +61,7 @@ namespace VTT_SHOP_API.Controllers
         }
 
         [HttpGet("FilterByPrice")]
-        public async Task<IActionResult> FilterByPrice(double priceMin, double priceMax)
+        public async Task<IActionResult> FilterByPrice(decimal priceMin, decimal priceMax)
         {
             var products = await _product.FilterProductByPriceAsync(priceMin, priceMax);
             if (products.Count == 0) 

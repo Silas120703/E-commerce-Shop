@@ -2,6 +2,7 @@
 using VTT_SHOP_CORE.DTOs;
 using VTT_SHOP_DATABASE.Entities;
 using VTT_SHOP_DATABASE.Repositories;
+using VTT_SHOP_SHARED.Interfaces.UnitOfWork;
 using VTT_SHOP_SHARED.Services;
 
 
@@ -12,7 +13,7 @@ namespace VTT_SHOP_CORE.Services
         private readonly ProductRepository _product;
         private readonly IMapper _mapper;
 
-        public ProductService(ProductRepository product, IMapper mapper) : base(product)
+        public ProductService(ProductRepository product, IMapper mapper, IUnitOfWork unitOfWork) : base(product)
         { 
             _product = product;
             _mapper = mapper;
@@ -45,7 +46,7 @@ namespace VTT_SHOP_CORE.Services
         }
         
 
-        public async Task<List<ProductDTO>> FilterProductByPriceAsync(double priceMin , double priceMax)
+        public async Task<List<ProductDTO>> FilterProductByPriceAsync(decimal priceMin , decimal priceMax)
         {
             var products = await _product.FilterProductByPriceAsync(priceMin, priceMax);
             return _mapper.Map<List<ProductDTO>>(products);

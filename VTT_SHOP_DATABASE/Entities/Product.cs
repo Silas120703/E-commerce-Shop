@@ -13,7 +13,7 @@ namespace VTT_SHOP_DATABASE.Entities
         public string? SlugName { get; set; } 
         public string? Description { get; set; }
         public int? Quantity { get; set; }
-        public double? Price { get; set; }
+        public decimal? Price { get; set; }
         public virtual ICollection<ProductPicture>? ProductPictures { get; set; }
     }
 }

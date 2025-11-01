@@ -34,7 +34,7 @@ namespace VTT_SHOP_DATABASE.Repositories
                              .ToListAsync();
         }
 
-        public async Task<List<Product>> FilterProductByPriceAsync(double priceMin,double priceMax)
+        public async Task<List<Product>> FilterProductByPriceAsync(decimal priceMin,decimal priceMax)
         {
             return await base.GetAll().Where(p => p.Price >= priceMin && p.Price <= priceMax).ToListAsync();
         }

@@ -24,10 +24,18 @@ namespace VTT_SHOP_SHARED.Services
 
         public async Task<T> AddAsync(T entity)
         {
-            entity.CreateAt= DateTime.UtcNow;
-           await _dbSet.AddAsync(entity);
-           return entity;
+            entity.CreateAt = DateTime.UtcNow;
+            await _dbSet.AddAsync(entity);
+            return entity;
+        }
 
+        public async Task AddRangeAsync(IEnumerable<T> entities)
+        {
+            foreach (var entity in entities)
+            {
+                entity.CreateAt = DateTime.UtcNow;
+            }
+            await _dbSet.AddRangeAsync(entities);
         }
 
         public void Delete(T entity)
@@ -47,13 +55,12 @@ namespace VTT_SHOP_SHARED.Services
 
         public T GetById(long id)
         {
-           return GetAll().FirstOrDefault(x => x.Id == id); 
-           
+            return _dbSet.Find(id);
         }
 
-        public async Task<T> GetByIdAsync(long id)
+        public async Task<T?> GetByIdAsync(long id)
         {
-            return await GetAll().FirstOrDefaultAsync(x=>x.Id == id);
+            return await _dbSet.FindAsync(id);
         }
 
         public T Update(T entity)
@@ -65,6 +72,10 @@ namespace VTT_SHOP_SHARED.Services
 
         public void UpdateRange(IEnumerable<T> entities)
         {
+            foreach (var entity in entities)
+            {
+                entity.UpdateAt = DateTime.UtcNow;
+            }
             _dbSet.UpdateRange(entities);
         }
     }

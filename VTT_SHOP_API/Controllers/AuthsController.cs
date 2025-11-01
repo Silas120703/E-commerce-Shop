@@ -3,12 +3,13 @@ using Microsoft.AspNetCore.Mvc;
 using VTT_SHOP_CORE.DTOs;
 using VTT_SHOP_CORE.Errors;
 using VTT_SHOP_CORE.Services.AuthService;
+using VTT_SHOP_SHARED.Services;
 
 namespace VTT_SHOP_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AuthsController : ControllerBase
+    public class AuthsController : ApiControllerBase
     {
         private readonly UserService _userService;
 

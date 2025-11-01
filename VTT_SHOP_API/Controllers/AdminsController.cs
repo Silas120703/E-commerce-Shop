@@ -2,12 +2,13 @@
 using Microsoft.AspNetCore.Mvc;
 using VTT_SHOP_CORE.DTOs;
 using VTT_SHOP_CORE.Services.AuthService;
+using VTT_SHOP_SHARED.Services;
 
 namespace VTT_SHOP_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AdminsController : ControllerBase
+    public class AdminsController : ApiControllerBase
     {
         private readonly UserService _admin;
 
