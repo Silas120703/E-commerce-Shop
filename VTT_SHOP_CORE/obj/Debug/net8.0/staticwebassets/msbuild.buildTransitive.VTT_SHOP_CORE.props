@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="..\buildMultiTargeting\VTT_SHOP_CORE.props" />
-</Project>
