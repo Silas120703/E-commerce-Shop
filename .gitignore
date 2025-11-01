@@ -1,2 +1,37 @@
-﻿# Bỏ qua file cấu hình chính
+﻿# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosf
+*.sln.docstates
+
+# Build Results
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+*.log
+*.pdb
+*.opendb
+*.cache
+
+# Packages
+packages/
+*.nupkg
+project.lock.json
+
+# Rider
+.idea/
+
+# Dotnet tool restore
+.config/dotnet-tools.json
+
+# Dependency directories
+node_modules/
+
+# Local settings
+appsettings.Development.json
+appsettings.Production.json
+appsettings.Staging.json
+appsettings.json.user
 appsettings.json
