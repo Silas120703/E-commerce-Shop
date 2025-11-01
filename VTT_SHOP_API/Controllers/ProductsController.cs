@@ -76,7 +76,7 @@ namespace VTT_SHOP_API.Controllers
         }
 
         [HttpGet("filter-by-price")]
-        public async Task<IActionResult> FilterByPrice([FromQuery] double priceMin, [FromQuery] double priceMax)
+        public async Task<IActionResult> FilterByPrice([FromQuery] decimal priceMin, [FromQuery] decimal priceMax)
         {
             var result = await _product.FilterProductByPriceAsync(priceMin, priceMax);
             if (result.IsSuccess)

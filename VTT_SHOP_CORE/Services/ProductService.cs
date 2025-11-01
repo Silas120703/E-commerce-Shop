@@ -95,7 +95,7 @@ namespace VTT_SHOP_CORE.Services
             return Result.Ok(_mapper.Map<List<ProductDTO>>(products));
         }
 
-        public async Task<Result<List<ProductDTO>>> FilterProductByPriceAsync(double priceMin, double priceMax)
+        public async Task<Result<List<ProductDTO>>> FilterProductByPriceAsync(decimal priceMin, decimal priceMax)
         {
             var products = await _product.FilterProductByPriceAsync(priceMin, priceMax);
             if (products == null || !products.Any())
