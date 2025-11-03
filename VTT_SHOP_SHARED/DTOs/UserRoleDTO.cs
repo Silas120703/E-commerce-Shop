@@ -1,4 +1,4 @@
-﻿namespace VTT_SHOP_CORE.DTOs
+﻿namespace VTT_SHOP_SHARED.DTOs
 {
     public class UserRoleDTO
     {

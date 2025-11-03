@@ -2,9 +2,10 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using System.Threading.Tasks;
-using VTT_SHOP_CORE.DTOs;
+using VTT_SHOP_SHARED.DTOs;
 using VTT_SHOP_CORE.Services;
 using VTT_SHOP_SHARED.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace VTT_SHOP_API.Controllers
 {
@@ -12,6 +13,7 @@ namespace VTT_SHOP_API.Controllers
     [ApiController]
     public class ProductsController : ApiControllerBase
     {
+        
         private readonly ProductService _product;
 
         public ProductsController(ProductService product)
@@ -29,6 +31,7 @@ namespace VTT_SHOP_API.Controllers
             }
             return NotFound(new { Message = result.Errors.FirstOrDefault()?.Message });
         }
+
 
         [HttpGet("search-product")]
         public async Task<IActionResult> SearchProduct([FromQuery] string name)

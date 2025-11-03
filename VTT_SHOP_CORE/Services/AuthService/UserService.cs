@@ -4,7 +4,7 @@ using FluentResults;
 using System.Security.Cryptography;
 using Microsoft.EntityFrameworkCore;
 using Org.BouncyCastle.Crypto.Generators;
-using VTT_SHOP_CORE.DTOs;
+using VTT_SHOP_SHARED.DTOs;
 using VTT_SHOP_DATABASE.Entities;
 using VTT_SHOP_DATABASE.Repositories;
 using VTT_SHOP_SHARED.Services;

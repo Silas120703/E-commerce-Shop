@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
-namespace VTT_SHOP_CORE.DTOs
+﻿namespace VTT_SHOP_SHARED.DTOs
 {
     public class UserDTO
     {

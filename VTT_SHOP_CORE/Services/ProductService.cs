@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using VTT_SHOP_CORE.DTOs;
+using VTT_SHOP_SHARED.DTOs;
 using VTT_SHOP_DATABASE.Entities;
 using VTT_SHOP_DATABASE.Repositories;
 using VTT_SHOP_SHARED.Interfaces.UnitOfWork;

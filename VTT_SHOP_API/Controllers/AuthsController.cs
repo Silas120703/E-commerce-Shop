@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using VTT_SHOP_CORE.DTOs;
+using VTT_SHOP_SHARED.DTOs;
 using VTT_SHOP_CORE.Errors;
 using VTT_SHOP_CORE.Services.AuthService;
 using VTT_SHOP_SHARED.Services;
