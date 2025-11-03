@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using VTT_SHOP_DATABASE.Entities;
-namespace VTT_SHOP_CORE.DTOs
+using VTT_SHOP_SHARED.DTOs;
+namespace VTT_SHOP_CORE.Mappers
 {
     public class MappingProfile : Profile
     {
@@ -18,6 +19,10 @@ namespace VTT_SHOP_CORE.DTOs
             CreateMap<User,UserCreateDTO>();
             CreateMap<UserRoleDTO,Role>();
             CreateMap<Role,UserRoleDTO>();
+            CreateMap<CartItemCreateDTO, CartItem>();
+            CreateMap<CartItem, CartItemCreateDTO>();
+            CreateMap<CartItemDTO, CartItem>();
+            CreateMap<CartItem, CartItemDTO>();
         }
     }
 }
