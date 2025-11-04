@@ -22,7 +22,11 @@ namespace VTT_SHOP_CORE.Mappers
             CreateMap<CartItemCreateDTO, CartItem>();
             CreateMap<CartItem, CartItemCreateDTO>();
             CreateMap<CartItemDTO, CartItem>();
-            CreateMap<CartItem, CartItemDTO>();
+            CreateMap<CartItem, CartItemDTO>()
+            .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product.Name))
+            .ForMember(dest => dest.ProductPrice, opt => opt.MapFrom(src => src.Product.Price))
+            .ForMember(dest => dest.ProductPicture, opt => opt.MapFrom(src =>
+                src.Product.ProductPictures.FirstOrDefault(pp => pp.IsMain).PictureUrl));
         }
     }
 }

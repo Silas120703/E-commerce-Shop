@@ -9,6 +9,7 @@ using VTT_SHOP_DATABASE.Entities;
 using VTT_SHOP_DATABASE.Repositories;
 using VTT_SHOP_SHARED.Interfaces.UnitOfWork;
 using VTT_SHOP_SHARED.Services;
+using VTT_SHOP_CORE.Errors;
 
 namespace VTT_SHOP_CORE.Services
 {
@@ -30,7 +31,7 @@ namespace VTT_SHOP_CORE.Services
             var product = await _product.GetProductByIdAsync(Id);
             if (product == null)
             {
-                return Result.Fail("No products found");
+                return Result.Fail( new NotFoundError($"Product with ID {Id} not found"));
             }
             return Result.Ok(_mapper.Map<ProductDTO>(product));
         }
@@ -68,7 +69,7 @@ namespace VTT_SHOP_CORE.Services
                 var existingProduct = await _product.GetByIdAsync(productDTO.Id);
                 if (existingProduct == null)
                 {
-                    return Result.Fail($"No product found with Id {productDTO.Id}");
+                    return Result.Fail(new NotFoundError($"No product found with Id {productDTO.Id}"));
                 }
 
                 _mapper.Map(productDTO, existingProduct);
@@ -90,7 +91,7 @@ namespace VTT_SHOP_CORE.Services
             var products = await _product.SearchProductByNameAsync(name);
             if (products == null || !products.Any())
             {
-                return Result.Fail("No products found");
+                return Result.Fail(new NotFoundError($"No products found with nam {name}"));
             }
             return Result.Ok(_mapper.Map<List<ProductDTO>>(products));
         }
@@ -100,7 +101,7 @@ namespace VTT_SHOP_CORE.Services
             var products = await _product.FilterProductByPriceAsync(priceMin, priceMax);
             if (products == null || !products.Any())
             {
-                return Result.Fail("No products found in this price range");
+                return Result.Fail(new NotFoundError($"No products found in price range {priceMin} to {priceMax}"));
             }
             return Result.Ok(_mapper.Map<List<ProductDTO>>(products));
         }
@@ -112,10 +113,11 @@ namespace VTT_SHOP_CORE.Services
                 var product = await _product.GetByIdAsync(id);
                 if (product == null)
                 {
-                    return Result.Fail("No products found");
+                    return Result.Fail(new NotFoundError("No products found"));
                 }
 
-                _product.Delete(product);
+                //_product.Delete(product);
+                _product.SoftDeleteProduct(product);
 
                 await _unitOfWork.SaveChangesAsync(); 
 

@@ -43,15 +43,15 @@ namespace VTT_SHOP_CORE.Services.AuthService
             var errors = new List<IError>();
             if (await _user.GetUserByEmail(user.Email) != null)
             {
-                errors.Add(new Error("Email already exists"));
+                errors.Add(new RegistrationError("Email already exists"));
             }
             if (await _user.GetUserByPhone(user.Phone) != null)
             {
-                errors.Add(new Error("Phone number already exists"));
+                errors.Add(new RegistrationError("Phone number already exists"));
             }
             if(user.Password.Length < 8)
             {
-                errors.Add(new Error("Password must be at least 8 characters long"));
+                errors.Add(new RegistrationError("Password must be at least 8 characters long"));
             }
             if (errors.Any())
             {
@@ -96,11 +96,11 @@ namespace VTT_SHOP_CORE.Services.AuthService
             var user = await _user.GetUserByPhoneOrEmail(login.Credential);
             if (user != null && user.IsEmailVerified == false)
             {
-                return Result.Fail(new AccountNotVerifiedError());
+                return Result.Fail(new AccountNotVerifiedError("Account not verified"));
             }
             if (user == null || !BCrypt.Net.BCrypt.Verify(login.Password, user.PasswordHash)) 
             {
-                return Result.Fail(new InvalidCredentialsError());
+                return Result.Fail(new InvalidCredentialsError("Incorrect username or password"));
             }
             var accessToken = _jwt.GenerateAccessToken(user);
             var refreshToken = _jwt.GenerateRefreshToken();
@@ -181,7 +181,7 @@ namespace VTT_SHOP_CORE.Services.AuthService
                 await _unitOfWork.SaveChangesAsync();
                 return Result.Ok(_mapper?.Map<UserDTO>(verifyUser.User));
             }
-            return Result.Fail("Invalid token");
+            return Result.Fail(new InvalidCredentialsError("Invalid or expired token"));
         }
 
         public async Task<Result> ResendVerificationEmail(ResendEmail resend)
@@ -190,7 +190,7 @@ namespace VTT_SHOP_CORE.Services.AuthService
 
             if (user == null)
             {
-                return Result.Fail("Email not found.");
+                return Result.Fail(new NotFoundError("Email not found"));
             }
 
             if (user.IsEmailVerified)
@@ -222,7 +222,7 @@ namespace VTT_SHOP_CORE.Services.AuthService
             var findUser = await _user.GetUserByPhoneOrEmail(forgot.Infor);
             if (findUser == null)
             {
-                return Result.Fail("User does not exist");
+                return Result.Fail(new NotFoundError("User does not exist"));
             }
             var newVerify = findUser.EmailVerificationToken;
                 newVerify.IsUsed = false;
@@ -242,7 +242,7 @@ namespace VTT_SHOP_CORE.Services.AuthService
             {
                 return Result.Ok(_jwt.GeneratePasswordResetToken(verifyUser.User));
             }
-            return Result.Fail("Invalid token");
+            return Result.Fail(new InvalidCredentialsError("Invalid token"));
         }
         public async Task<Result> ResetPassword(ResetPasswordDto model)
         {
@@ -251,7 +251,7 @@ namespace VTT_SHOP_CORE.Services.AuthService
                 var principal = _jwt.ValidatePasswordResetToken(model.ResetToken);
                 if (principal == null)
                 {
-                    return Result.Fail("Token is invalid or expired");
+                    return Result.Fail(new InvalidCredentialsError("Token is invalid or expired"));
                 }
 
                 var userIdString = principal.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -263,7 +263,7 @@ namespace VTT_SHOP_CORE.Services.AuthService
                 var user = await _user.GetByIdAsync(userId);
                 if (user == null)
                 {
-                    return Result.Fail("No user associated with this token found");
+                    return Result.Fail(new NotFoundError("No user associated with this token found"));
                 }
                 user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.NewPassword);
                 _user.Update(user);
@@ -272,18 +272,18 @@ namespace VTT_SHOP_CORE.Services.AuthService
             }
             catch (Exception ex)
             {
-                return Result.Fail("Reset password failed");
+                return Result.Fail("Reset password failed "+ex.Message);
             }
         }
 
-        public async Task<UserRoleDTO?> AddRoleAsync(UserRoleDTO role)
+        public async Task<Result<UserRoleDTO?>> AddRoleAsync(UserRoleDTO role)
         {
             if (role != null)
             {
                 var newRole = await _role.AddAsync(_mapper.Map<Role>(role));
-                return _mapper.Map<UserRoleDTO>(newRole);
+                return Result.Ok(_mapper?.Map<UserRoleDTO>(newRole));
             }
-            return null;
+            return Result.Fail("Add role failed");
         }
     }
 }
