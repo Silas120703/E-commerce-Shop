@@ -12,7 +12,7 @@ namespace VTT_SHOP_API.Controllers
     [ApiController]
     public class ProductsController : ApiControllerBase
     {
-        
+
         private readonly ProductService _product;
 
         public ProductsController(ProductService product)
@@ -60,6 +60,40 @@ namespace VTT_SHOP_API.Controllers
         public async Task<IActionResult> FilterByPrice([FromQuery] decimal priceMin, [FromQuery] decimal priceMax)
         {
             var result = await _product.FilterProductByPriceAsync(priceMin, priceMax);
+            return HandleResult(result);
+        }
+
+        [HttpGet("get-product-picture")]
+        public async Task<IActionResult> GetProductPictures(long productId)
+        {
+            var result = await _product.GetProductPicturesAsync(productId);
+            return HandleResult(result);
+        }
+
+        [HttpPost("add-product-picture")]
+        public async Task<IActionResult> AddProductPicture(UpdateProductPictureDTO pictureDTO)
+        {
+            var result = await _product.AddProductPictureAsync(pictureDTO);
+            return HandleResult(result);
+        }
+
+        [HttpDelete("delete-product-picture/{pictureId}")]
+        public async Task<IActionResult> DeleteProductPicture(long productId, long pictureId)
+        {
+            var result = await _product.DeleteProductPictureAsync(productId, pictureId);
+            return HandleResult(result);
+        }
+        [HttpPut("set-main-product-picture")]
+        public async Task<IActionResult> SetMainProductPicture(long productId, long pictureId)
+        {
+            var result = await _product.SetMainProductPictureAsync(productId, pictureId);
+            return HandleResult(result);
+        }
+
+        [HttpPut("un-set-main-product-picture")]
+        public async Task<IActionResult> UnSetMainProductPicture(long productId, long pictureId)
+        {
+            var result = await _product.UnsetMainProductPictureAsync(productId, pictureId);
             return HandleResult(result);
         }
     }

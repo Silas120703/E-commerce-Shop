@@ -7,12 +7,16 @@ namespace VTT_SHOP_CORE.Mappers
     {
         public MappingProfile() 
         {
-            CreateMap<Product, ProductDTO>();   
+            CreateMap<Product, ProductDTO>()
+                .ForMember(dest => dest.ProductPicture, opt => opt.MapFrom(src =>
+                src.ProductPictures.FirstOrDefault(pp => pp.IsMain).PictureUrl));   
             CreateMap<Product, CreateProductDTO>();
             CreateMap<Product, UpdateProductDTO>();
             CreateMap<ProductDTO, Product>();
             CreateMap<CreateProductDTO, Product>();
             CreateMap<UpdateProductDTO, Product>();
+            CreateMap<ProductPicture, UpdateProductPictureDTO>();
+            CreateMap<UpdateProductPictureDTO, ProductPicture>();
             CreateMap<UserCreateDTO, User>();
             CreateMap<UserDTO, User>();
             CreateMap<User,UserDTO>();
