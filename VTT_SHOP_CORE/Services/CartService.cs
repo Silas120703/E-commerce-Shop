@@ -39,10 +39,10 @@ namespace VTT_SHOP_CORE.Services
             var cart = await _cart.GetCartByUserIdAsync(userId);
             if (cart == null)
             {
-                return Result.Ok(new List<CartItemDTO>()); 
+                return Result.Ok(new List<CartItemDTO>());
             }
-            var cartItemDTOs = await _cartItem.GetCartItemDTOsByCartIdAsync(cart.Id);
-
+            var cartItems = await _cartItem.GetCartItemDTOsByCartIdAsync(cart.Id);
+            var cartItemDTOs = _mapper.Map<List<CartItemDTO>>(cartItems);
             return Result.Ok(cartItemDTOs);
         }
 
@@ -88,14 +88,6 @@ namespace VTT_SHOP_CORE.Services
                 await _unitOfWork.SaveChangesAsync();
                 itemToReturn.Product = product;
                 var cartItemResult = _mapper.Map<CartItemDTO>(itemToReturn);
-                cartItemResult.ProductName = product.Name;
-                cartItemResult.ProductPrice = product.Price;
-
-                var productPicture = await _productPiture.GetMainPictureByProductIdAsync(product.Id);
-                if (productPicture != null)
-                {
-                    cartItemResult.ProductPicture = productPicture.PictureUrl;
-                }
                 await _unitOfWork.CommitAsync();
                 return Result.Ok(cartItemResult);
             }

@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using VTT_SHOP_DATABASE.Entities;
-using VTT_SHOP_SHARED.DTOs;
 using VTT_SHOP_SHARED.Services;
 
 namespace VTT_SHOP_DATABASE.Repositories
@@ -33,22 +32,12 @@ namespace VTT_SHOP_DATABASE.Repositories
             await base.AddRangeAsync(cartItems);
         }
 
-        public async Task<List<CartItemDTO>> GetCartItemDTOsByCartIdAsync(long cartId)
+        public async Task<List<CartItem>> GetCartItemDTOsByCartIdAsync(long cartId)
         {
             return await base.GetAll()
-                .Where(ci => ci.CartId == cartId)
-                .Select(ci => new CartItemDTO
-                {
-                    CartId = ci.CartId,
-                    ProductId = ci.ProductId,
-                    Quantity = ci.Quantity,
-                    ProductName = ci.Product.Name,
-                    ProductPrice = ci.Product.Price,
-                    ProductPicture = ci.Product.ProductPictures
-                        .Where(pp => pp.IsMain)
-                        .Select(pp => pp.PictureUrl)
-                        .FirstOrDefault()
-                })
+                .Include(c => c.Product)
+                .Include(c => c.Product!.ProductPictures)
+                .Where(c => c.CartId==cartId)
                 .ToListAsync();
         }
 

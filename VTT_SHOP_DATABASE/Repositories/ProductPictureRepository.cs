@@ -17,5 +17,27 @@ namespace VTT_SHOP_DATABASE.Repositories
         {
             return await GetAll().FirstOrDefaultAsync(pp => pp.ProductId == productId && pp.IsMain);
         }
+
+        public void SetMainPicture(ProductPicture productPicture)
+        {
+            productPicture.IsMain = true;
+            base.Update(productPicture);
+        }
+
+        public void UnsetMainPicture(ProductPicture productPicture)
+        {
+            productPicture.IsMain = false;
+            base.Update(productPicture);
+        }
+
+        public async Task<ProductPicture> AddProductPictureAsync(ProductPicture productPicture)
+        {
+            await AddAsync(productPicture);
+            return productPicture;
+        }
+        public void DeleteProductPicture(ProductPicture productPicture)
+        {
+            Delete(productPicture);
+        }
     }
 }

@@ -22,21 +22,26 @@ namespace VTT_SHOP_DATABASE.Repositories
             return base.Update(product);
         }
 
-        public async Task<Product> GetProductByIdAsync(long id)
+        public async Task<Product?> GetProductByIdAsync(long id)
         {
-            return await base.GetByIdAsync(id);
+            return await base.GetAll()
+                .Include(p => p.ProductPictures)
+                .FirstOrDefaultAsync(p => p.Id == id);
         }
 
         public async Task<List<Product>> SearchProductByNameAsync(string name)
         {
             return await base.GetAll()
-                             .Where(p => p.Name.Contains(name) || p.Description.Contains(name))
-                             .ToListAsync();
+                .Include(p => p.ProductPictures)
+                .Where(p => p.Name.Contains(name) || p.Description.Contains(name))
+                .ToListAsync();
         }
 
         public async Task<List<Product>> FilterProductByPriceAsync(decimal priceMin,decimal priceMax)
         {
-            return await base.GetAll().Where(p => p.Price >= priceMin && p.Price <= priceMax).ToListAsync();
+            return await base.GetAll()
+                .Include(p => p.ProductPictures)
+                .Where(p => p.Price >= priceMin && p.Price <= priceMax).ToListAsync();
         }
         public bool SoftDeleteProduct(Product product)
         {

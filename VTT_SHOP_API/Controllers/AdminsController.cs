@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using VTT_SHOP_SHARED.DTOs;
 using VTT_SHOP_CORE.Services.AuthService;
-using VTT_SHOP_SHARED.Services;
 
 namespace VTT_SHOP_API.Controllers
 {
@@ -20,12 +19,8 @@ namespace VTT_SHOP_API.Controllers
         [HttpPost("add-role")]
         public async Task<IActionResult> AddRole(UserRoleDTO role)
         {
-            var newRole = await _admin.AddRoleAsync(role);
-            if (newRole != null)
-            {
-                return Ok(newRole);
-            }
-            return BadRequest("Add role failed");
+            var result = await _admin.AddRoleAsync(role);
+            return HandleResult(result);
         }
     }
 }

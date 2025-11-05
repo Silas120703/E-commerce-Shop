@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using VTT_SHOP_CORE.Services;
 using VTT_SHOP_SHARED.DTOs;
-using VTT_SHOP_SHARED.Services;
 
 namespace VTT_SHOP_API.Controllers
 {
@@ -23,14 +22,7 @@ namespace VTT_SHOP_API.Controllers
         {
             var userId = CurrentUserId;
             var result = await _cartService.GetCartItemsByUserIdAsync(userId);
-            if (result.IsSuccess)
-            {
-                return Ok(result.Value);
-            }
-            else
-            {
-                return BadRequest(new { Message = result.Errors.FirstOrDefault()?.Message });
-            }
+            return HandleResult(result);
         }
 
         [Authorize]
@@ -39,14 +31,7 @@ namespace VTT_SHOP_API.Controllers
         {
             var userId = CurrentUserId;
             var result = await _cartService.AddCartItem(userId, cartItemDto);
-            if (result.IsSuccess)
-            {
-                return Ok(result.Value);
-            }
-            else
-            {
-                return BadRequest(new { Message = result.Errors.FirstOrDefault()?.Message });
-            }
+            return HandleResult(result);
         }
 
         [Authorize]
@@ -55,14 +40,7 @@ namespace VTT_SHOP_API.Controllers
         {
             var userId = CurrentUserId;
             var result = await _cartService.DeleteCartItem(userId, cartItemDeleteDto);
-            if (result.IsSuccess)
-            {
-                return Ok();
-            }
-            else
-            {
-                return BadRequest(new { Message = result.Errors.FirstOrDefault()?.Message });
-            }
+            return HandleResult(result);
         }
 
     }

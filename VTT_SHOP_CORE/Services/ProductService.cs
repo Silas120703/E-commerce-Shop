@@ -9,18 +9,21 @@ using VTT_SHOP_DATABASE.Entities;
 using VTT_SHOP_DATABASE.Repositories;
 using VTT_SHOP_SHARED.Interfaces.UnitOfWork;
 using VTT_SHOP_SHARED.Services;
+using VTT_SHOP_CORE.Errors;
 
 namespace VTT_SHOP_CORE.Services
 {
     public class ProductService : ServiceBase<Product>
     {
         private readonly ProductRepository _product;
+        private readonly ProductPictureRepository _productPicture;
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
 
-        public ProductService(ProductRepository product, IMapper mapper, IUnitOfWork unitOfWork) : base(product)
+        public ProductService(ProductRepository product, ProductPictureRepository productPicture, IMapper mapper, IUnitOfWork unitOfWork) : base(product)
         {
             _product = product;
+            _productPicture = productPicture;
             _mapper = mapper;
             _unitOfWork = unitOfWork;
         }
@@ -30,7 +33,7 @@ namespace VTT_SHOP_CORE.Services
             var product = await _product.GetProductByIdAsync(Id);
             if (product == null)
             {
-                return Result.Fail("No products found");
+                return Result.Fail(new NotFoundError($"Product with ID {Id} not found"));
             }
             return Result.Ok(_mapper.Map<ProductDTO>(product));
         }
@@ -68,7 +71,7 @@ namespace VTT_SHOP_CORE.Services
                 var existingProduct = await _product.GetByIdAsync(productDTO.Id);
                 if (existingProduct == null)
                 {
-                    return Result.Fail($"No product found with Id {productDTO.Id}");
+                    return Result.Fail(new NotFoundError($"No product found with Id {productDTO.Id}"));
                 }
 
                 _mapper.Map(productDTO, existingProduct);
@@ -90,7 +93,7 @@ namespace VTT_SHOP_CORE.Services
             var products = await _product.SearchProductByNameAsync(name);
             if (products == null || !products.Any())
             {
-                return Result.Fail("No products found");
+                return Result.Fail(new NotFoundError($"No products found with nam {name}"));
             }
             return Result.Ok(_mapper.Map<List<ProductDTO>>(products));
         }
@@ -100,7 +103,7 @@ namespace VTT_SHOP_CORE.Services
             var products = await _product.FilterProductByPriceAsync(priceMin, priceMax);
             if (products == null || !products.Any())
             {
-                return Result.Fail("No products found in this price range");
+                return Result.Fail(new NotFoundError($"No products found in price range {priceMin} to {priceMax}"));
             }
             return Result.Ok(_mapper.Map<List<ProductDTO>>(products));
         }
@@ -112,18 +115,116 @@ namespace VTT_SHOP_CORE.Services
                 var product = await _product.GetByIdAsync(id);
                 if (product == null)
                 {
-                    return Result.Fail("No products found");
+                    return Result.Fail(new NotFoundError("No products found"));
                 }
 
-                _product.Delete(product);
+                //_product.Delete(product);
+                _product.SoftDeleteProduct(product);
 
-                await _unitOfWork.SaveChangesAsync(); 
+                await _unitOfWork.SaveChangesAsync();
 
                 return Result.Ok().WithSuccess("Product deleted successfully");
             }
             catch (Exception ex)
             {
                 return Result.Fail("An error occurred while deleting the product: " + ex.Message);
+            }
+        }
+
+        public async Task<Result<UpdateProductPictureDTO>> AddProductPictureAsync(UpdateProductPictureDTO productPictureDTO)
+        {
+            try
+            {
+                var productPicture = _mapper.Map<ProductPicture>(productPictureDTO);
+                var newProductPiture = await _productPicture.AddProductPictureAsync(productPicture);
+                await _unitOfWork.SaveChangesAsync();
+                return Result.Ok(_mapper.Map<UpdateProductPictureDTO>(newProductPiture)).WithSuccess("Product picture added successfully");
+            }
+            catch (Exception ex)
+            {
+                return Result.Fail("An error occurred while adding the product picture: " + ex.Message);
+            }
+        }
+
+        public async Task<Result> SetMainProductPictureAsync(long productId, long pictureId)
+        {
+            try
+            {
+                var pictures = await _productPicture.GetPicturesByProductIdAsync(productId);
+                var newMainPicture = pictures.FirstOrDefault(pp => pp.Id == pictureId);
+                if (newMainPicture == null)
+                {
+                    return Result.Fail(new NotFoundError($"No picture found with ID {pictureId} for product ID {productId}"));
+                }
+                var currentMainPicture = pictures.FirstOrDefault(pp => pp.IsMain);
+                if (currentMainPicture != null)
+                {
+                    _productPicture.UnsetMainPicture(currentMainPicture);
+                }
+                _productPicture.SetMainPicture(newMainPicture);
+                await _unitOfWork.SaveChangesAsync();
+                return Result.Ok().WithSuccess("Main product picture set successfully");
+            }
+            catch (Exception ex)
+            {
+                return Result.Fail("An error occurred while setting the main product picture: " + ex.Message);
+            }
+        }
+
+        public async Task<Result> DeleteProductPictureAsync(long productId, long pictureId)
+        {
+            try
+            {
+                var pictures = await _productPicture.GetPicturesByProductIdAsync(productId);
+                var pictureToDelete = pictures.FirstOrDefault(pp => pp.Id == pictureId);
+                if (pictureToDelete == null)
+                {
+                    return Result.Fail(new NotFoundError($"No picture found with ID {pictureId} for product ID {productId}"));
+                }
+                _productPicture.DeleteProductPicture(pictureToDelete);
+                await _unitOfWork.SaveChangesAsync();
+                return Result.Ok().WithSuccess("Product picture deleted successfully");
+            }
+            catch (Exception ex)
+            {
+                return Result.Fail("An error occurred while deleting the product picture: " + ex.Message);
+            }
+        }
+
+        public async Task<Result<List<UpdateProductPictureDTO>>> GetProductPicturesAsync(long productId)
+        {
+            try
+            {
+                var pictures = await _productPicture.GetPicturesByProductIdAsync(productId);
+                if (pictures == null || !pictures.Any())
+                {
+                    return Result.Fail(new NotFoundError($"No pictures found for product ID {productId}"));
+                }
+                return Result.Ok(_mapper.Map<List<UpdateProductPictureDTO>>(pictures)).WithSuccess("Product pictures retrieved successfully");
+            }
+            catch (Exception ex)
+            {
+                return Result.Fail("An error occurred while retrieving the product pictures: " + ex.Message);
+            }
+        }
+
+        public async Task<Result> UnsetMainProductPictureAsync(long productId, long pictureId)
+        {
+            try
+            {
+                var pictures = await _productPicture.GetPicturesByProductIdAsync(productId);
+                var pictureToUnset = pictures.FirstOrDefault(pp => pp.Id == pictureId);
+                if (pictureToUnset == null)
+                {
+                    return Result.Fail(new NotFoundError($"No picture found with ID {pictureId} for product ID {productId}"));
+                }
+                _productPicture.UnsetMainPicture(pictureToUnset);
+                await _unitOfWork.SaveChangesAsync();
+                return Result.Ok().WithSuccess("Main product picture unset successfully");
+            }
+            catch (Exception ex)
+            {
+                return Result.Fail("An error occurred while unsetting the main product picture: " + ex.Message);
             }
         }
     }
