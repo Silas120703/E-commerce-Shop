@@ -8,8 +8,8 @@ namespace VTT_SHOP_CORE.Mappers
         public MappingProfile() 
         {
             CreateMap<Product, ProductDTO>()
-                .ForMember(dest => dest.ProductPicture, opt => opt.MapFrom(src =>
-                src.ProductPictures.FirstOrDefault(pp => pp.IsMain).PictureUrl));   
+                .ForMember(dest => dest.ProductPictureId,opt => opt.MapFrom(src => src.ProductPictures.FirstOrDefault(pp => pp.IsMain).Id))
+                .ForMember(dest => dest.ProductPicture, opt => opt.MapFrom(src => src.ProductPictures.FirstOrDefault(pp => pp.IsMain).PictureUrl));   
             CreateMap<Product, CreateProductDTO>();
             CreateMap<Product, UpdateProductDTO>();
             CreateMap<ProductDTO, Product>();
@@ -17,6 +17,8 @@ namespace VTT_SHOP_CORE.Mappers
             CreateMap<UpdateProductDTO, Product>();
             CreateMap<ProductPicture, UpdateProductPictureDTO>();
             CreateMap<UpdateProductPictureDTO, ProductPicture>();
+            CreateMap<ProductPictureDTO, ProductPicture>();
+            CreateMap<ProductPicture, ProductPictureDTO>();
             CreateMap<UserCreateDTO, User>();
             CreateMap<UserDTO, User>();
             CreateMap<User,UserDTO>();
