@@ -93,7 +93,7 @@ namespace VTT_SHOP_CORE.Services
             var products = await _product.SearchProductByNameAsync(name);
             if (products == null || !products.Any())
             {
-                return Result.Fail(new NotFoundError($"No products found with nam {name}"));
+                return Result.Fail(new NotFoundError($"No products found with name {name}"));
             }
             return Result.Ok(_mapper.Map<List<ProductDTO>>(products));
         }
@@ -131,14 +131,14 @@ namespace VTT_SHOP_CORE.Services
             }
         }
 
-        public async Task<Result<UpdateProductPictureDTO>> AddProductPictureAsync(UpdateProductPictureDTO productPictureDTO)
+        public async Task<Result<ProductPictureDTO>> AddProductPictureAsync(UpdateProductPictureDTO productPictureDTO)
         {
             try
             {
                 var productPicture = _mapper.Map<ProductPicture>(productPictureDTO);
                 var newProductPiture = await _productPicture.AddProductPictureAsync(productPicture);
                 await _unitOfWork.SaveChangesAsync();
-                return Result.Ok(_mapper.Map<UpdateProductPictureDTO>(newProductPiture)).WithSuccess("Product picture added successfully");
+                return Result.Ok(_mapper.Map<ProductPictureDTO>(newProductPiture)).WithSuccess("Product picture added successfully");
             }
             catch (Exception ex)
             {
@@ -191,7 +191,7 @@ namespace VTT_SHOP_CORE.Services
             }
         }
 
-        public async Task<Result<List<UpdateProductPictureDTO>>> GetProductPicturesAsync(long productId)
+        public async Task<Result<List<ProductPictureDTO>>> GetProductPicturesAsync(long productId)
         {
             try
             {
@@ -200,7 +200,7 @@ namespace VTT_SHOP_CORE.Services
                 {
                     return Result.Fail(new NotFoundError($"No pictures found for product ID {productId}"));
                 }
-                return Result.Ok(_mapper.Map<List<UpdateProductPictureDTO>>(pictures)).WithSuccess("Product pictures retrieved successfully");
+                return Result.Ok(_mapper.Map<List<ProductPictureDTO>>(pictures)).WithSuccess("Product pictures retrieved successfully");
             }
             catch (Exception ex)
             {

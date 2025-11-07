@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VTT_SHOP_API", "VTT_SHOP_API.csproj", "{F7B692EF-2BA3-A5A4-2628-ABFC2E09187E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F7B692EF-2BA3-A5A4-2628-ABFC2E09187E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7B692EF-2BA3-A5A4-2628-ABFC2E09187E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7B692EF-2BA3-A5A4-2628-ABFC2E09187E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7B692EF-2BA3-A5A4-2628-ABFC2E09187E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E09F90B4-73CB-4323-A569-2EAE09AFA7CE}
+	EndGlobalSection
+EndGlobal
