@@ -5,6 +5,7 @@ using VTT_SHOP_DATABASE.Entities;
 using VTT_SHOP_DATABASE.Repositories;
 using VTT_SHOP_SHARED.Interfaces.UnitOfWork;
 using VTT_SHOP_SHARED.Services;
+using VTT_SHOP_CORE.Errors;
 
 namespace VTT_SHOP_CORE.Services
 {
@@ -33,7 +34,7 @@ namespace VTT_SHOP_CORE.Services
         {
             if (await _user.GetByIdAsync(userId) == null)
             {
-                return Result.Fail<List<CartItemDTO>>("User not found");
+                return Result.Fail( new NotFoundError("User not found"));
             }
 
             var cart = await _cart.GetCartByUserIdAsync(userId);
@@ -51,12 +52,12 @@ namespace VTT_SHOP_CORE.Services
 
             if (await _user.GetByIdAsync(userId) == null)
             {
-                return Result.Fail("User not found");
+                return Result.Fail( new NotFoundError("User not found"));
             }
             var product = await _product.GetByIdAsync(cartItemDto.ProductId);
             if (product==null)
             {
-                return Result.Fail("Product not found");
+                return Result.Fail(new NotFoundError("Product not found"));
             }
             try
             {

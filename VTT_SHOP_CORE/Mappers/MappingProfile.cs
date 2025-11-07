@@ -33,6 +33,12 @@ namespace VTT_SHOP_CORE.Mappers
             .ForMember(dest => dest.ProductPrice, opt => opt.MapFrom(src => src.Product.Price))
             .ForMember(dest => dest.ProductPicture, opt => opt.MapFrom(src =>
                 src.Product.ProductPictures.FirstOrDefault(pp => pp.IsMain).PictureUrl));
+            CreateMap<WishListItem, WishListDTO>()
+            .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product.Name))
+            .ForMember(dest => dest.ProductPrice, opt => opt.MapFrom(src => src.Product.Price))
+            .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.Product.Quantity))
+            .ForMember(dest => dest.ProductPicture, opt => opt.MapFrom(src =>
+                src.Product.ProductPictures.FirstOrDefault(pp => pp.IsMain).PictureUrl));
         }
     }
 }
