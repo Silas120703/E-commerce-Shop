@@ -39,6 +39,8 @@ namespace VTT_SHOP_CORE.Mappers
             .ForMember(dest => dest.Quantity, opt => opt.MapFrom(src => src.Product.Quantity))
             .ForMember(dest => dest.ProductPicture, opt => opt.MapFrom(src =>
                 src.Product.ProductPictures.FirstOrDefault(pp => pp.IsMain).PictureUrl));
+            CreateMap<Address, AddressDTO>();
+            CreateMap<AddressDTO, Address>();
         }
     }
 }
