@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using VTT_SHOP_CORE.Services.AuthService;
+using VTT_SHOP_CORE.Services;
 using VTT_SHOP_SHARED.DTOs;
 
 namespace VTT_SHOP_API.Controllers
