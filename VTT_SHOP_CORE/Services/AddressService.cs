@@ -9,7 +9,7 @@ using VTT_SHOP_SHARED.DTOs;
 using VTT_SHOP_SHARED.Interfaces.UnitOfWork;
 using VTT_SHOP_SHARED.Services;
 
-namespace VTT_SHOP_CORE.Services.AuthService
+namespace VTT_SHOP_CORE.Services
 {
     public class AddressService : ServiceBase<Address>
     {
