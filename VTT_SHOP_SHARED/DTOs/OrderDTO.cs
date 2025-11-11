@@ -19,6 +19,21 @@
     {
         public string Status { get; set; }
         public decimal TotalAmount { get; set; }
+        public decimal DiscountAmount { get; set; } 
+        public decimal FinalAmount { get; set; } 
+        public DateTime CreateAt { get; set; }
         public List<OrderItemDTO> Items { get; set; }
+    }
+
+    public class CreateOrderDTO
+    {
+        public long ShippingAddressId { get; set; }
+        public string? CouponCode { get; set; } 
+    }
+
+    public class CreateOrderWithItemsDTO
+    {
+        public CreateOrderDTO createOrderDTO { get; set; }
+        public OrderItemCreateDTO OrderItemCreateDTO { get; set; }
     }
 }

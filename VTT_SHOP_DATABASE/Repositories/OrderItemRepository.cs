@@ -16,6 +16,7 @@ namespace VTT_SHOP_DATABASE.Repositories
         public async Task<List<OrderItem>> GetOrderItemsByOrderIdAsync(int orderId)
         {
             return await base.GetAll()
+                .Include(oi => oi.Product)
                 .Where(oi => oi.OrderId == orderId).ToListAsync();
         }
 
