@@ -17,6 +17,7 @@
 
     public class OrderDetailDTO
     {
+        public long Id { get; set; }
         public string Status { get; set; }
         public decimal TotalAmount { get; set; }
         public decimal DiscountAmount { get; set; } 

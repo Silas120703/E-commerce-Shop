@@ -16,6 +16,16 @@ namespace VTT_SHOP_DATABASE.Repositories
                 .FirstOrDefaultAsync(c => c.Code == code && c.IsActive);
         }
 
+        public async Task<Coupon> CreateCoupon(Coupon coupon)
+        {
+            return await base.AddAsync(coupon);
+        }
+
+        public Coupon UpdateCoupon (Coupon coupon)
+        {
+            return  base.Update(coupon);   
+        }
+
         public async Task<bool> IsEligibleAsync(long couponId, decimal orderAmount)
         {
             var coupon = await GetByIdAsync(couponId);

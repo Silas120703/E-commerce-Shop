@@ -217,8 +217,9 @@ namespace VTT_SHOP_CORE.Services
                     };
                     await _couponUsage.AddAsync(couponUsage);
                     await _unitOfWork.SaveChangesAsync();
-                    await _unitOfWork.CommitAsync();
+                    
                 }
+                await _unitOfWork.CommitAsync();
                 return Result.Ok(_mapper.Map<OrderDetailDTO>(newOrder));
             }
             catch (Exception ex)
@@ -233,15 +234,9 @@ namespace VTT_SHOP_CORE.Services
             var user = await _user.GetUserByIdAsync(userId);
             if (user == null)
             {
-                return Result.Fail<List<OrderDetailDTO>>(new NotFoundError($"User not found with Id {userId}"));
+                return Result.Fail(new NotFoundError($"User not found with Id {userId}"));
             }
-
             var orders = await _order.GetOrdersByUserIdAsync(userId);
-            if (orders == null || !orders.Any())
-            {
-                return Result.Fail<List<OrderDetailDTO>>(new NotFoundError("No orders found for the user."));
-            }
-
             var orderDetails = _mapper.Map<List<OrderDetailDTO>>(orders);
             return Result.Ok(orderDetails);
         }

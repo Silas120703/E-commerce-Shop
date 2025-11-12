@@ -63,6 +63,11 @@ namespace VTT_SHOP_CORE.Mappers
             CreateMap<OrderItemCreateDTO, OrderItem>();
             CreateMap<OrderItem, OrderItemCreateDTO>();
 
+            CreateMap<Coupon, CouponDTO>();
+            CreateMap<CouponDTO, Coupon>();
+            CreateMap<CouponDetailDTO, Coupon>();
+            CreateMap<Coupon, CouponDetailDTO>();
+
         }
     }
 }
