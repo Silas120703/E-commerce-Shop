@@ -6,7 +6,7 @@ namespace VTT_SHOP_DATABASE.Entities
     {
         public string Code { get; set; }
         public string Description { get; set; }
-        public string DiscountType { get; set; }
+        public string DiscountType { get; set; } // "Percentage" or "FixedAmount"
         public decimal DiscountValue { get; set; }
         public decimal MaxDiscountValue { get; set; }
         public decimal MinOrderValue { get; set; }

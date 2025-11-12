@@ -29,7 +29,7 @@ namespace VTT_SHOP_CORE.Services.AuthService
             var token = new JwtSecurityToken(
                 issuer: _config["JWT:Issuer"],
                 audience: _config["JWT:Audience"],
-                expires: DateTime.UtcNow.AddMinutes(30),
+                expires: DateTime.UtcNow.AddDays(3),
                 claims: authClaims,
                 signingCredentials: creds
             );
