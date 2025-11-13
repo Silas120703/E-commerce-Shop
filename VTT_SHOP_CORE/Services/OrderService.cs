@@ -20,6 +20,8 @@ namespace VTT_SHOP_CORE.Services
         private readonly ProductRepository _product;
         private readonly CouponRepository _coupon;
         private readonly CouponUsageRepository _couponUsage;
+        private readonly PaymentRepository _payment; 
+        private readonly ShipmentRepository _shipment; 
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
 
@@ -31,7 +33,9 @@ namespace VTT_SHOP_CORE.Services
             CartItemRepository cartItem,
             ProductRepository product,
             CouponRepository coupon, 
-            CouponUsageRepository couponUsage, 
+            CouponUsageRepository couponUsage,
+            PaymentRepository payment, 
+            ShipmentRepository shipment, 
             IMapper mapper,
             IUnitOfWork unitOfWork) : base(order)
         {
@@ -42,8 +46,10 @@ namespace VTT_SHOP_CORE.Services
             _cart = cart;
             _cartItem = cartItem;
             _product = product;
-            _coupon = coupon; // Thêm
-            _couponUsage = couponUsage; // Thêm
+            _coupon = coupon; 
+            _couponUsage = couponUsage;
+            _payment = payment;
+            _shipment = shipment;
             _mapper = mapper;
             _unitOfWork = unitOfWork;
         }
@@ -103,8 +109,9 @@ namespace VTT_SHOP_CORE.Services
                     couponId = coupon.Id;
                     _coupon.IncrementUsageCount(coupon);
                 }
-                
-                
+                decimal shippingFee = 30000;
+                decimal finalAmount = totalAmount - discountAmount + shippingFee;
+
                 var oderItems = _mapper.Map<List<OrderItem>>(cartItems);
                 var order = new Order
                 {
@@ -113,12 +120,31 @@ namespace VTT_SHOP_CORE.Services
                     Status = "Pending",
                     TotalAmount = totalAmount,
                     DiscountAmount = discountAmount,
-                    FinalAmount = totalAmount - discountAmount,
+                    ShippingFee = shippingFee,
+                    FinalAmount = finalAmount,
                     ShippingAddress = address,
                     Items = oderItems
                 };
                 await _order.AddAsync(order);
                 await _unitOfWork.SaveChangesAsync();
+
+                var payment = new Payment
+                {
+                    OrderId = order.Id,
+                    Amount = finalAmount,
+                    PaymentMethod = createOrderDto.PaymentMethod,
+                    Status = "pending", 
+                    TransactionDate = null
+                };
+                await _payment.AddAsync(payment);
+
+                var shipment = new Shipment
+                {
+                    OrderId = order.Id,
+                    Carrier = "Pending", 
+                    Status = "PendingPreparation", 
+                };
+                await _shipment.AddAsync(shipment);
                 if (couponId != 0)
                 {
                     var couponUsage = new CouponUsage
@@ -192,13 +218,17 @@ namespace VTT_SHOP_CORE.Services
                     couponId = coupon.Id;
                     _coupon.IncrementUsageCount(coupon);
                 }
+                decimal shippingFee = 30000;
+                decimal finalAmount = totalAmount - discountAmount + shippingFee;
+
                 var newOrder = new Order()
                 {
                     UserId = userId,
                     Status = "Pending",
                     TotalAmount = totalAmount,
                     DiscountAmount = discountAmount,
-                    FinalAmount = totalAmount - discountAmount,
+                    ShippingFee = shippingFee,
+                    FinalAmount = finalAmount,
                     ShippingAddressId = createOrderDto.ShippingAddressId
                 };
                 await _order.AddAsync(newOrder);
@@ -207,7 +237,25 @@ namespace VTT_SHOP_CORE.Services
                 await _orderItem.AddAsync(oderItem);
                 await _unitOfWork.SaveChangesAsync();
 
-                if(couponId != 0)
+                var payment = new Payment
+                {
+                    OrderId = newOrder.Id,
+                    Amount = finalAmount,
+                    PaymentMethod = createOrderDto.PaymentMethod,
+                    Status = "pending",
+                    TransactionDate = null
+                };
+                await _payment.AddAsync(payment);
+
+                var shipment = new Shipment
+                {
+                    OrderId = newOrder.Id,
+                    Carrier = "Pending",
+                    Status = "PendingPreparation",
+                };
+                await _shipment.AddAsync(shipment);
+
+                if (couponId != 0)
                 {
                     var couponUsage = new CouponUsage
                     {
