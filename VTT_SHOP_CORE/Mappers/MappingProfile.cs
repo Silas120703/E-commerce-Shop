@@ -53,7 +53,7 @@ namespace VTT_SHOP_CORE.Mappers
                 .ForMember(dest => dest.TotalAmount, opt => opt.MapFrom(src => src.TotalAmount))
                 .ForMember(dest => dest.DiscountAmount, opt => opt.MapFrom(src => src.DiscountAmount))
                 .ForMember(dest => dest.FinalAmount, opt => opt.MapFrom(src => src.FinalAmount))
-                .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items ));
+                .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items));
 
             CreateMap<CartItem,OrderItem>()
                 .ForMember(dest => dest.ProductId, opt => opt.MapFrom(src => src.ProductId))
