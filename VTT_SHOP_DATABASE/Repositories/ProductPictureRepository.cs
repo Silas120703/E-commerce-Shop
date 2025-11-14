@@ -9,33 +9,33 @@ namespace VTT_SHOP_DATABASE.Repositories
         public ProductPictureRepository(VTTShopDBContext context) : base(context)
         {
         }
-        public async Task<List<ProductPicture>> GetPicturesByProductIdAsync(long productId)
+        public virtual async Task<List<ProductPicture>> GetPicturesByProductIdAsync(long productId)
         {
             return await GetAll().Where(pp => pp.ProductId == productId).ToListAsync();
         }
-        public async Task<ProductPicture?> GetMainPictureByProductIdAsync(long productId)
+        public virtual async Task<ProductPicture?> GetMainPictureByProductIdAsync(long productId)
         {
             return await GetAll().FirstOrDefaultAsync(pp => pp.ProductId == productId && pp.IsMain);
         }
 
-        public void SetMainPicture(ProductPicture productPicture)
+        public virtual void SetMainPicture(ProductPicture productPicture)
         {
             productPicture.IsMain = true;
             base.Update(productPicture);
         }
 
-        public void UnsetMainPicture(ProductPicture productPicture)
+        public virtual void UnsetMainPicture(ProductPicture productPicture)
         {
             productPicture.IsMain = false;
             base.Update(productPicture);
         }
 
-        public async Task<ProductPicture> AddProductPictureAsync(ProductPicture productPicture)
+        public virtual async Task<ProductPicture> AddProductPictureAsync(ProductPicture productPicture)
         {
             await AddAsync(productPicture);
             return productPicture;
         }
-        public void DeleteProductPicture(ProductPicture productPicture)
+        public virtual void DeleteProductPicture(ProductPicture productPicture)
         {
             Delete(productPicture);
         }

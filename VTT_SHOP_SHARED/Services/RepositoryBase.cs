@@ -10,26 +10,33 @@ namespace VTT_SHOP_SHARED.Services
         private readonly DbContext _dbContext;
         private readonly DbSet<T> _dbSet;
 
+        protected RepositoryBase()
+        {
+            
+        }
         public RepositoryBase(DbContext dbContext)
         {
             _dbContext = dbContext;
-            _dbSet = _dbContext.Set<T>();
+            if (dbContext != null)
+            {
+                _dbSet = _dbContext.Set<T>();
+            }
         }
-        public T Add(T entity)
+        public virtual T Add(T entity)
         {
             entity.CreateAt = DateTime.UtcNow;
             _dbSet.Add(entity);
             return entity;
         }
 
-        public async Task<T> AddAsync(T entity)
+        public virtual async Task<T> AddAsync(T entity)
         {
             entity.CreateAt = DateTime.UtcNow;
             await _dbSet.AddAsync(entity);
             return entity;
         }
 
-        public async Task AddRangeAsync(IEnumerable<T> entities)
+        public virtual async Task AddRangeAsync(IEnumerable<T> entities)
         {
             foreach (var entity in entities)
             {
@@ -38,39 +45,39 @@ namespace VTT_SHOP_SHARED.Services
             await _dbSet.AddRangeAsync(entities);
         }
 
-        public void Delete(T entity)
+        public virtual void Delete(T entity)
         {
             _dbSet.Remove(entity);
         }
 
-        public void DeleteRange(IEnumerable<T> entities)
+        public virtual void DeleteRange(IEnumerable<T> entities)
         {
             _dbSet.RemoveRange(entities);
         }
 
-        public IQueryable<T> GetAll()
+        public virtual IQueryable<T> GetAll()
         {
             return _dbSet.AsQueryable();
         }
 
-        public T GetById(long id)
+        public virtual T GetById(long id)
         {
             return _dbSet.Find(id);
         }
 
-        public async Task<T?> GetByIdAsync(long id)
+        public virtual async Task<T?> GetByIdAsync(long id)
         {
             return await _dbSet.FindAsync(id);
         }
 
-        public T Update(T entity)
+        public virtual T Update(T entity)
         {
             entity.UpdateAt = DateTime.UtcNow;
             _dbSet.Update(entity);
             return entity;
         }
 
-        public void UpdateRange(IEnumerable<T> entities)
+        public virtual void UpdateRange(IEnumerable<T> entities)
         {
             foreach (var entity in entities)
             {

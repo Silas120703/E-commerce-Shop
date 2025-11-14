@@ -12,43 +12,43 @@ namespace VTT_SHOP_DATABASE.Repositories
 
         }
         
-        public async Task<User> AddUserAsync(User user)
+        public virtual async Task<User> AddUserAsync(User user)
         {
             return await base.AddAsync(user);
         }
 
-        public User UpdateUser(User  user)
+        public virtual User UpdateUser(User  user)
         {
             return base.Update(user);
         }
 
-        public async Task<User?> GetUserByIdAsync(long id)
+        public virtual async Task<User?> GetUserByIdAsync(long id)
         {
             return await base.GetAll().FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public async Task<User?> GetUserByPhone(string phone)
+        public              async Task<User?> GetUserByPhone(string phone)
         {
             return await base.GetAll()
                 .Include(g => g.EmailVerificationToken)
                 .FirstOrDefaultAsync(g => g.Phone == phone);
         }
 
-        public async Task<User?> GetUserByPhoneOrEmail(string infor)
+        public virtual async Task<User?> GetUserByPhoneOrEmail(string infor)
         {
             return await base.GetAll()
                 .Include(g => g.EmailVerificationToken)
                 .FirstOrDefaultAsync(g => g.Phone == infor||g.Email==infor);
         }
 
-        public async Task<User?> GetUserByEmail(string email)
+        public virtual async Task<User?> GetUserByEmail(string email)
         {
             return await base.GetAll()
                 .Include(g => g.EmailVerificationToken)
                 .FirstOrDefaultAsync(g => g.Email == email);
         }
 
-        public async Task<List<User>> SearchUser(string search)
+        public virtual async Task<List<User>> SearchUser(string search)
         {
             return await base.GetAll().Where(s => s.Phone.Contains(search) || s.Email.Contains(search) || s.Name.Contains(search)).ToListAsync();
         }

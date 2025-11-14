@@ -10,7 +10,7 @@ namespace VTT_SHOP_DATABASE.Repositories
         {
         }
 
-        public async Task<int> CountByUserIdAndCouponIdAsync(long userId, long couponId)
+        public virtual async Task<int> CountByUserIdAndCouponIdAsync(long userId, long couponId)
         {
             return await base.GetAll()
                 .CountAsync(cu => cu.UserId == userId && cu.CouponId == couponId);
