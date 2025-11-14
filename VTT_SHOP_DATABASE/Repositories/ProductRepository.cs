@@ -12,24 +12,24 @@ namespace VTT_SHOP_DATABASE.Repositories
         { 
 
         }
-        public async Task<Product> AddProductAsync(Product product)
+        public virtual async Task<Product> AddProductAsync(Product product)
         {
             return await base.AddAsync(product);
         }
 
-        public Product UpdateProduct(Product product)
+        public virtual Product UpdateProduct(Product product)
         {
             return base.Update(product);
         }
 
-        public async Task<Product?> GetProductByIdAsync(long id)
+        public virtual async Task<Product?> GetProductByIdAsync(long id)
         {
             return await base.GetAll()
                 .Include(p => p.ProductPictures)
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
 
-        public async Task<List<Product>> SearchProductByNameAsync(string name)
+        public virtual async Task<List<Product>> SearchProductByNameAsync(string name)
         {
             return await base.GetAll()
                 .Include(p => p.ProductPictures)
@@ -37,13 +37,13 @@ namespace VTT_SHOP_DATABASE.Repositories
                 .ToListAsync();
         }
 
-        public async Task<List<Product>> FilterProductByPriceAsync(decimal priceMin,decimal priceMax)
+        public virtual async Task<List<Product>> FilterProductByPriceAsync(decimal priceMin,decimal priceMax)
         {
             return await base.GetAll()
                 .Include(p => p.ProductPictures)
                 .Where(p => p.Price >= priceMin && p.Price <= priceMax).ToListAsync();
         }
-        public bool SoftDeleteProduct(Product product)
+        public virtual bool SoftDeleteProduct(Product product)
         {
             if (product != null)
             {
@@ -54,7 +54,7 @@ namespace VTT_SHOP_DATABASE.Repositories
             return false;
         }
 
-        public bool HardDeleteProduct(Product product)
+        public virtual bool HardDeleteProduct(Product product)
         {
             if (product != null)
             {
@@ -64,7 +64,7 @@ namespace VTT_SHOP_DATABASE.Repositories
             return false;
         }
 
-        public Product AddSlugName(Product product)
+        public virtual Product AddSlugName(Product product)
         {
              product.SlugName = SlugExtensions.ToSlug(product.Name, product.Id);
              base.Update(product);

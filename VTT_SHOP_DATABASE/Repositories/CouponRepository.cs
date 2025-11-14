@@ -10,23 +10,23 @@ namespace VTT_SHOP_DATABASE.Repositories
         {
         }
 
-        public async Task<Coupon?> GetByCodeAsync(string code)
+        public virtual async Task<Coupon?> GetByCodeAsync(string code)
         {
             return await base.GetAll()
                 .FirstOrDefaultAsync(c => c.Code == code && c.IsActive);
         }
 
-        public async Task<Coupon> CreateCoupon(Coupon coupon)
+        public virtual async Task<Coupon> CreateCoupon(Coupon coupon)
         {
             return await base.AddAsync(coupon);
         }
 
-        public Coupon UpdateCoupon (Coupon coupon)
+        public virtual Coupon UpdateCoupon (Coupon coupon)
         {
             return  base.Update(coupon);   
         }
 
-        public async Task<bool> IsEligibleAsync(long couponId, decimal orderAmount)
+        public virtual async Task<bool> IsEligibleAsync(long couponId, decimal orderAmount)
         {
             var coupon = await GetByIdAsync(couponId);
             if (coupon == null || !coupon.IsActive)
@@ -49,7 +49,7 @@ namespace VTT_SHOP_DATABASE.Repositories
             return true;
         }
 
-        public void IncrementUsageCount(Coupon coupon)
+        public virtual void IncrementUsageCount(Coupon coupon)
         {
             coupon.UsedCount += 1;
         }

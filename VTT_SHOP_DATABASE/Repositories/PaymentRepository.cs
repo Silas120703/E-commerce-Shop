@@ -10,7 +10,7 @@ namespace VTT_SHOP_DATABASE.Repositories
         {
         }
 
-        public async Task<Payment?> GetByOrderIdAsync(long orderId)
+        public virtual async Task<Payment?> GetByOrderIdAsync(long orderId)
         {
             return await base.GetAll().FirstOrDefaultAsync(p => p.OrderId == orderId);
         }

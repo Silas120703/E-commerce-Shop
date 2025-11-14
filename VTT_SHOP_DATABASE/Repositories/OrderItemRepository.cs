@@ -13,14 +13,14 @@ namespace VTT_SHOP_DATABASE.Repositories
             _context = context;
         }
 
-        public async Task<List<OrderItem>> GetOrderItemsByOrderIdAsync(int orderId)
+        public virtual async Task<List<OrderItem>> GetOrderItemsByOrderIdAsync(int orderId)
         {
             return await base.GetAll()
                 .Include(oi => oi.Product)
                 .Where(oi => oi.OrderId == orderId).ToListAsync();
         }
 
-        public async Task AddOderItemAsync(List<OrderItem> orderItems)
+        public virtual async Task AddOderItemAsync(List<OrderItem> orderItems)
         {
             await base.AddRangeAsync(orderItems);
         }

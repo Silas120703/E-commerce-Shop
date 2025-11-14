@@ -10,22 +10,22 @@ namespace VTT_SHOP_DATABASE.Repositories
         {
         }
 
-        public async Task<Cart?> GetCartByUserIdAsync(long userId)
+        public virtual async Task<Cart?> GetCartByUserIdAsync(long userId)
         {
             return await base.GetAll().FirstOrDefaultAsync(c => c.UserId == userId);
         }
-        public async Task<Cart?> GetCartWithItemsByUserIdAsync(long userId)
+        public virtual async Task<Cart?> GetCartWithItemsByUserIdAsync(long userId)
         {
             return await base.GetAll()
                 .Include(c => c.Items)
                 .FirstOrDefaultAsync(c => c.UserId == userId);
         }
-        public async Task<bool> CartExistsAsync(long userId)
+        public virtual async Task<bool> CartExistsAsync(long userId)
         {
             return await base.GetAll().AnyAsync(c => c.UserId == userId);
         }
 
-        public async Task<Cart?> CreateCartAsync(Cart cart)
+        public virtual async Task<Cart?> CreateCartAsync(Cart cart)
         {
             await base.AddAsync(cart);
             return cart;
