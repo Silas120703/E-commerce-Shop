@@ -32,11 +32,6 @@ namespace VTT_SHOP_CORE.Services
             _config = config;
         }
 
-        /// <summary>
-        /// Xử lý URL trả về (Return URL) từ VNPay.
-        /// Chỉ xác thực và tạo URL redirect về Frontend.
-        /// </summary>
-        /// <returns>URL để redirect về Frontend</returns>
         public string ProcessVnPayReturn(IQueryCollection query)
         {
             bool isValidSignature = _vnPayService.ValidateSignature(query, out string RspCode, out _);
@@ -56,11 +51,7 @@ namespace VTT_SHOP_CORE.Services
             return $"{frontendReturnUrl}?status={statusQuery}&orderId={query["vnp_TxnRef"]}";
         }
 
-        /// <summary>
-        /// Xử lý IPN (Instant Payment Notification) từ VNPay.
-        /// Xác thực, cập nhật CSDL và trả về kết quả cho VNPay.
-        /// </summary>
-        /// <returns>Đối tượng VnPayIpnResponse để trả về cho VNPay</returns>
+
         public async Task<VnPayIpnResponse> ProcessVnPayIpnAsync(IQueryCollection query)
         {
             bool isValidSignature = _vnPayService.ValidateSignature(query, out string RspCode, out _);
@@ -86,14 +77,12 @@ namespace VTT_SHOP_CORE.Services
                     return new VnPayIpnResponse { RspCode = "02", Message = "Order already confirmed" };
                 }
 
-                // Kiểm tra số tiền
                 long vnpAmount = Convert.ToInt64(query["vnp_Amount"]) / 100;
                 if (vnpAmount != (long)order.FinalAmount)
                 {
                     return new VnPayIpnResponse { RspCode = "04", Message = "Invalid amount" };
                 }
 
-                // Bắt đầu Transaction
                 await _unitOfWork.BeginTransactionAsync();
 
                 if (RspCode == "00")
