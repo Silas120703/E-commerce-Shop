@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using VTT_SHOP_CORE.Services;
 using VTT_SHOP_SHARED.DTOs;
+using FluentResults; // <-- Thêm
 
 namespace VTT_SHOP_API.Controllers
 {
@@ -13,7 +14,8 @@ namespace VTT_SHOP_API.Controllers
     {
         private readonly OrderService _orderService;
 
-        public OrdersController(OrderService orderService) 
+        // *** CHỈ CẦN TIÊM OrderService ***
+        public OrdersController(OrderService orderService)
         {
             _orderService = orderService;
         }
@@ -22,7 +24,10 @@ namespace VTT_SHOP_API.Controllers
         public async Task<IActionResult> CreateOrderFromCart([FromBody] CreateOrderDTO createOrderDto)
         {
             var userId = CurrentUserId;
-            var result = await _orderService.CreateOrderFromCartAsync(userId, createOrderDto);
+            var ipAddress = CurrentUserIpAddress; 
+
+            var result = await _orderService.CreateOrderFromCartAsync(userId, createOrderDto, ipAddress);
+
             return HandleResult(result);
         }
 
@@ -30,7 +35,10 @@ namespace VTT_SHOP_API.Controllers
         public async Task<IActionResult> CreateOrderFromProduct(CreateOrderWithItemsDTO model)
         {
             var userId = CurrentUserId;
-            var result = await _orderService.CreateOrderFromProductAsync(userId, model.OrderItemCreateDTO,model.createOrderDTO);
+            var ipAddress = CurrentUserIpAddress; 
+
+            var result = await _orderService.CreateOrderFromProductAsync(userId, model.OrderItemCreateDTO, model.createOrderDTO, ipAddress);
+
             return HandleResult(result);
         }
 

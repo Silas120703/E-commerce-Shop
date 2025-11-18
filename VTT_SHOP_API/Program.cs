@@ -25,6 +25,8 @@ builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<JWTService>();
+builder.Services.AddScoped<VnPayService>();
+builder.Services.AddScoped<PaymentService>();
 
 builder.Services.AddAuthentication(options =>
 {
