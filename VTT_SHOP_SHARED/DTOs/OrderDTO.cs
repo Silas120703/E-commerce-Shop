@@ -39,4 +39,16 @@
         public CreateOrderDTO createOrderDTO { get; set; }
         public OrderItemCreateDTO OrderItemCreateDTO { get; set; }
     }
+
+    public class CreateOrderResponseDTO
+    {
+        public OrderDetailDTO OrderDetail { get; set; } = null!;
+        public string? PaymentUrl { get; set; }
+    }
+
+    public class VnPayIpnResponse
+    {
+        public string RspCode { get; set; } = null!;
+        public string Message { get; set; } = null!;
+    }
 }

@@ -6,6 +6,8 @@ using VTT_SHOP_DATABASE.Repositories;
 using VTT_SHOP_SHARED.DTOs;
 using VTT_SHOP_SHARED.Interfaces.UnitOfWork;
 using VTT_SHOP_SHARED.Services;
+using System.Collections.Generic; // Thêm using này
+using System.Linq; // Thêm using này
 
 namespace VTT_SHOP_CORE.Services
 {
@@ -20,11 +22,15 @@ namespace VTT_SHOP_CORE.Services
         private readonly ProductRepository _product;
         private readonly CouponRepository _coupon;
         private readonly CouponUsageRepository _couponUsage;
-        private readonly PaymentRepository _payment; 
-        private readonly ShipmentRepository _shipment; 
+        private readonly PaymentRepository _payment;
+        private readonly ShipmentRepository _shipment;
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
 
+        // 1. Thêm VnPayService
+        private readonly VnPayService _vnPayService;
+
+        // 2. Cập nhật Constructor để tiêm VnPayService
         public OrderService(OrderRepository order,
             OrderItemRepository orderItem,
             UserRepository user,
@@ -32,12 +38,13 @@ namespace VTT_SHOP_CORE.Services
             CartRepository cart,
             CartItemRepository cartItem,
             ProductRepository product,
-            CouponRepository coupon, 
+            CouponRepository coupon,
             CouponUsageRepository couponUsage,
-            PaymentRepository payment, 
-            ShipmentRepository shipment, 
+            PaymentRepository payment,
+            ShipmentRepository shipment,
             IMapper mapper,
-            IUnitOfWork unitOfWork) : base(order)
+            IUnitOfWork unitOfWork,
+            VnPayService vnPayService) : base(order) 
         {
             _order = order;
             _orderItem = orderItem;
@@ -46,15 +53,16 @@ namespace VTT_SHOP_CORE.Services
             _cart = cart;
             _cartItem = cartItem;
             _product = product;
-            _coupon = coupon; 
+            _coupon = coupon;
             _couponUsage = couponUsage;
             _payment = payment;
             _shipment = shipment;
             _mapper = mapper;
             _unitOfWork = unitOfWork;
+            _vnPayService = vnPayService; 
         }
 
-        public async Task<Result<OrderDetailDTO>> CreateOrderFromCartAsync(long userId, CreateOrderDTO createOrderDto)
+        public async Task<Result<CreateOrderResponseDTO>> CreateOrderFromCartAsync(long userId, CreateOrderDTO createOrderDto, string ipAddress)
         {
             var user = await _user.GetByIdAsync(userId);
             if (user == null)
@@ -83,7 +91,7 @@ namespace VTT_SHOP_CORE.Services
 
                 decimal totalAmount = cartItems.Sum(item => item.Quantity * (item.Product?.Price ?? 0));
                 decimal discountAmount = 0;
-                long couponId = 0;
+                long? couponId = null; 
                 if (createOrderDto.CouponCode != null)
                 {
                     var coupon = await _coupon.GetByCodeAsync(createOrderDto.CouponCode);
@@ -105,9 +113,9 @@ namespace VTT_SHOP_CORE.Services
                         {
                             discountAmount = coupon.DiscountValue;
                         }
+                        couponId = coupon.Id;
+                        _coupon.IncrementUsageCount(coupon);
                     }
-                    couponId = coupon.Id;
-                    _coupon.IncrementUsageCount(coupon);
                 }
                 decimal shippingFee = 30000;
                 decimal finalAmount = totalAmount - discountAmount + shippingFee;
@@ -126,14 +134,14 @@ namespace VTT_SHOP_CORE.Services
                     Items = oderItems
                 };
                 await _order.AddAsync(order);
-                await _unitOfWork.SaveChangesAsync();
+                await _unitOfWork.SaveChangesAsync(); 
 
                 var payment = new Payment
                 {
                     OrderId = order.Id,
                     Amount = finalAmount,
                     PaymentMethod = createOrderDto.PaymentMethod,
-                    Status = "pending", 
+                    Status = "pending",
                     TransactionDate = null
                 };
                 await _payment.AddAsync(payment);
@@ -141,25 +149,38 @@ namespace VTT_SHOP_CORE.Services
                 var shipment = new Shipment
                 {
                     OrderId = order.Id,
-                    Carrier = "Pending", 
-                    Status = "PendingPreparation", 
+                    Carrier = "Pending",
+                    Status = "PendingPreparation",
                 };
                 await _shipment.AddAsync(shipment);
-                if (couponId != 0)
+
+                if (couponId.HasValue) 
                 {
                     var couponUsage = new CouponUsage
                     {
-                        CouponId = couponId,
+                        CouponId = couponId, 
                         UserId = userId,
                         OrderId = order.Id
                     };
                     await _couponUsage.AddAsync(couponUsage);
-                    await _unitOfWork.SaveChangesAsync();
                 }
                 _cartItem.DeleteCartItemRange(cartItems);
                 await _unitOfWork.SaveChangesAsync();
                 await _unitOfWork.CommitAsync();
-                return Result.Ok(_mapper.Map<OrderDetailDTO>(order));
+
+                string? paymentUrl = null;
+                if (createOrderDto.PaymentMethod == "VNPay")
+                {
+                    paymentUrl = await _vnPayService.CreatePaymentUrl(order.Id, ipAddress);
+                }
+
+                var responseDto = new CreateOrderResponseDTO
+                {
+                    OrderDetail = _mapper.Map<OrderDetailDTO>(order),
+                    PaymentUrl = paymentUrl
+                };
+
+                return Result.Ok(responseDto);
             }
             catch (Exception ex)
             {
@@ -168,7 +189,7 @@ namespace VTT_SHOP_CORE.Services
             }
         }
 
-        public async Task<Result<OrderDetailDTO>> CreateOrderFromProductAsync(long userId, OrderItemCreateDTO orderItemCreateDTO, CreateOrderDTO createOrderDto)
+        public async Task<Result<CreateOrderResponseDTO>> CreateOrderFromProductAsync(long userId, OrderItemCreateDTO orderItemCreateDTO, CreateOrderDTO createOrderDto, string ipAddress)
         {
             var user = await _user.GetUserByIdAsync(userId);
             if (user == null)
@@ -180,7 +201,7 @@ namespace VTT_SHOP_CORE.Services
             {
                 return Result.Fail(new NotFoundError($"Not found product with Id {orderItemCreateDTO.ProductId}"));
             }
-            
+
             var address = await _address.GetByIdAsync(createOrderDto.ShippingAddressId);
             if (address == null || address.UserId != userId)
             {
@@ -192,7 +213,7 @@ namespace VTT_SHOP_CORE.Services
                 var oderItem = _mapper.Map<OrderItem>(orderItemCreateDTO);
                 decimal totalAmount = orderItemCreateDTO.Quantity * orderItemCreateDTO.Price;
                 decimal discountAmount = 0;
-                long couponId = 0;
+                long? couponId = null; 
                 if (createOrderDto.CouponCode != null)
                 {
                     var coupon = await _coupon.GetByCodeAsync(createOrderDto.CouponCode);
@@ -214,9 +235,9 @@ namespace VTT_SHOP_CORE.Services
                         {
                             discountAmount = coupon.DiscountValue;
                         }
+                        couponId = coupon.Id;
+                        _coupon.IncrementUsageCount(coupon);
                     }
-                    couponId = coupon.Id;
-                    _coupon.IncrementUsageCount(coupon);
                 }
                 decimal shippingFee = 30000;
                 decimal finalAmount = totalAmount - discountAmount + shippingFee;
@@ -229,13 +250,16 @@ namespace VTT_SHOP_CORE.Services
                     DiscountAmount = discountAmount,
                     ShippingFee = shippingFee,
                     FinalAmount = finalAmount,
-                    ShippingAddressId = createOrderDto.ShippingAddressId
+                    ShippingAddressId = createOrderDto.ShippingAddressId,
+                    ShippingAddress = address
                 };
                 await _order.AddAsync(newOrder);
-                await _unitOfWork.SaveChangesAsync();
+                await _unitOfWork.SaveChangesAsync(); 
+
                 oderItem.OrderId = newOrder.Id;
                 await _orderItem.AddAsync(oderItem);
-                await _unitOfWork.SaveChangesAsync();
+
+                newOrder.Items = new List<OrderItem> { oderItem };
 
                 var payment = new Payment
                 {
@@ -255,7 +279,7 @@ namespace VTT_SHOP_CORE.Services
                 };
                 await _shipment.AddAsync(shipment);
 
-                if (couponId != 0)
+                if (couponId.HasValue) 
                 {
                     var couponUsage = new CouponUsage
                     {
@@ -264,11 +288,24 @@ namespace VTT_SHOP_CORE.Services
                         OrderId = newOrder.Id
                     };
                     await _couponUsage.AddAsync(couponUsage);
-                    await _unitOfWork.SaveChangesAsync();
-                    
                 }
+
+                await _unitOfWork.SaveChangesAsync();
                 await _unitOfWork.CommitAsync();
-                return Result.Ok(_mapper.Map<OrderDetailDTO>(newOrder));
+
+                string? paymentUrl = null;
+                if (createOrderDto.PaymentMethod == "VNPay")
+                {
+                    paymentUrl = await _vnPayService.CreatePaymentUrl(newOrder.Id, ipAddress);
+                }
+
+                var responseDto = new CreateOrderResponseDTO
+                {
+                    OrderDetail = _mapper.Map<OrderDetailDTO>(newOrder),
+                    PaymentUrl = paymentUrl
+                };
+
+                return Result.Ok(responseDto);
             }
             catch (Exception ex)
             {
@@ -289,6 +326,4 @@ namespace VTT_SHOP_CORE.Services
             return Result.Ok(orderDetails);
         }
     }
-
 }
-

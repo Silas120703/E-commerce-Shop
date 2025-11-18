@@ -1,5 +1,7 @@
 ﻿using FluentResults;
 using Microsoft.AspNetCore.Mvc;
+using System.Net.Sockets;
+using System.Net;
 using System.Security.Claims;
 using VTT_SHOP_CORE.Errors;
 
@@ -18,6 +20,32 @@ namespace VTT_SHOP_API.Controllers
                     return userId;
                 }
                 return 0;
+            }
+        }
+
+        protected string CurrentUserIpAddress
+        {
+            get
+            {
+                var ipAddress = string.Empty;
+                try
+                {
+                    var remoteIpAddress = HttpContext.Connection.RemoteIpAddress;
+                    if (remoteIpAddress != null)
+                    {
+                        if (remoteIpAddress.AddressFamily == AddressFamily.InterNetworkV6)
+                        {
+                            remoteIpAddress = Dns.GetHostEntry(remoteIpAddress).AddressList
+                                .FirstOrDefault(x => x.AddressFamily == AddressFamily.InterNetwork);
+                        }
+                        if (remoteIpAddress != null) ipAddress = remoteIpAddress.ToString();
+                    }
+                }
+                catch (Exception)
+                {
+                    ipAddress = "127.0.0.1"; 
+                }
+                return ipAddress ?? "127.0.0.1";
             }
         }
 
