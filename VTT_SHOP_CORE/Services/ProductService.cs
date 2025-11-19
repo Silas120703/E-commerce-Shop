@@ -10,6 +10,8 @@ using VTT_SHOP_DATABASE.Repositories;
 using VTT_SHOP_SHARED.Interfaces.UnitOfWork;
 using VTT_SHOP_SHARED.Services;
 using VTT_SHOP_CORE.Errors;
+using Microsoft.EntityFrameworkCore;
+using VTT_SHOP_SHARED.Extensions;
 
 namespace VTT_SHOP_CORE.Services
 {
@@ -26,6 +28,46 @@ namespace VTT_SHOP_CORE.Services
             _productPicture = productPicture;
             _mapper = mapper;
             _unitOfWork = unitOfWork;
+        }
+
+        public async Task<Result<PagedResult<ProductDTO>>> GetProductsPagedAsync(ProductPagingParams pagingParams)
+        {
+            var query = _product.GetAll()
+                .Include(p => p.ProductPictures)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(pagingParams.SearchTerm))
+            {
+                var term = pagingParams.SearchTerm.ToLower();
+                query = query.Where(p => p.Name.ToLower().Contains(term) ||
+                                         (p.Description != null && p.Description.ToLower().Contains(term)));
+            }
+
+            if (pagingParams.MinPrice.HasValue)
+                query = query.Where(p => p.Price >= pagingParams.MinPrice);
+
+            if (pagingParams.MaxPrice.HasValue)
+                query = query.Where(p => p.Price <= pagingParams.MaxPrice);
+
+            query = pagingParams.SortBy switch
+            {
+                "priceAsc" => query.OrderBy(p => p.Price),
+                "priceDesc" => query.OrderByDescending(p => p.Price),
+                _ => query.OrderByDescending(p => p.CreateAt) 
+            };
+
+            var pagedEntities = await query.ToPagedListAsync(pagingParams.PageIndex, pagingParams.PageSize);
+
+            var productDtos = _mapper.Map<List<ProductDTO>>(pagedEntities.Items);
+
+            var result = new PagedResult<ProductDTO>(
+                productDtos,
+                pagedEntities.TotalCount,
+                pagedEntities.PageIndex,
+                pagedEntities.PageSize
+            );
+
+            return Result.Ok(result);
         }
 
         public async Task<Result<ProductDTO>> GetProductByIdAsync(long Id)

@@ -13,11 +13,17 @@ namespace VTT_SHOP_API.Controllers
     public class OrdersController : ApiControllerBase
     {
         private readonly OrderService _orderService;
-
-        // *** CHỈ CẦN TIÊM OrderService ***
         public OrdersController(OrderService orderService)
         {
             _orderService = orderService;
+        }
+
+        [HttpGet("my-orders")] 
+        public async Task<IActionResult> GetMyOrders([FromQuery] PagingParams pagingParams)
+        {
+            var userId = CurrentUserId;
+            var result = await _orderService.GetUserOrdersPagedAsync(userId, pagingParams);
+            return HandleResult(result);
         }
 
         [HttpPost("create-from-cart")]

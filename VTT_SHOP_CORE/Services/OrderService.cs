@@ -7,7 +7,9 @@ using VTT_SHOP_SHARED.DTOs;
 using VTT_SHOP_SHARED.Interfaces.UnitOfWork;
 using VTT_SHOP_SHARED.Services;
 using System.Collections.Generic; // Thêm using này
-using System.Linq; // Thêm using này
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
+using VTT_SHOP_SHARED.Extensions; // Thêm using này
 
 namespace VTT_SHOP_CORE.Services
 {
@@ -26,11 +28,7 @@ namespace VTT_SHOP_CORE.Services
         private readonly ShipmentRepository _shipment;
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
-
-        // 1. Thêm VnPayService
         private readonly VnPayService _vnPayService;
-
-        // 2. Cập nhật Constructor để tiêm VnPayService
         public OrderService(OrderRepository order,
             OrderItemRepository orderItem,
             UserRepository user,
@@ -60,6 +58,35 @@ namespace VTT_SHOP_CORE.Services
             _mapper = mapper;
             _unitOfWork = unitOfWork;
             _vnPayService = vnPayService; 
+        }
+
+        public async Task<Result<PagedResult<OrderDetailDTO>>> GetUserOrdersPagedAsync(long userId, PagingParams pagingParams)
+        {
+            var user = await _user.GetByIdAsync(userId);
+            if (user == null)
+            {
+                return Result.Fail(new NotFoundError($"User not found with Id {userId}"));
+            }
+
+            var query = _order.GetAll()
+                .Include(o => o.Items).ThenInclude(oi => oi.Product) 
+                .Include(o => o.Payment)
+                .Include(o => o.Shipment)
+                .Where(o => o.UserId == userId)
+                .OrderByDescending(o => o.CreateAt);
+
+            var pagedEntities = await query.ToPagedListAsync(pagingParams.PageIndex, pagingParams.PageSize);
+
+            var orderDtos = _mapper.Map<List<OrderDetailDTO>>(pagedEntities.Items);
+
+            var result = new PagedResult<OrderDetailDTO>(
+                orderDtos,
+                pagedEntities.TotalCount,
+                pagedEntities.PageIndex,
+                pagedEntities.PageSize
+            );
+
+            return Result.Ok(result);
         }
 
         public async Task<Result<CreateOrderResponseDTO>> CreateOrderFromCartAsync(long userId, CreateOrderDTO createOrderDto, string ipAddress)
