@@ -20,6 +20,13 @@ namespace VTT_SHOP_API.Controllers
             _product = product;
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetProducts([FromQuery] ProductPagingParams pagingParams)
+        {
+            var result = await _product.GetProductsPagedAsync(pagingParams);
+            return HandleResult(result);
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetProductById(long id)
         {
