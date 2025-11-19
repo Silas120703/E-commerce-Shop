@@ -12,6 +12,16 @@ namespace VTT_SHOP_DATABASE.Repositories
         { 
 
         }
+
+        public async Task<List<Product>> GetProductsPagedAsync(int pageIndex, int pageSize)
+        {
+            return await base.GetAll()
+                .Include(p => p.ProductPictures)
+                .OrderByDescending(p => p.CreateAt)
+                .Skip((pageIndex - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
         public virtual async Task<Product> AddProductAsync(Product product)
         {
             return await base.AddAsync(product);

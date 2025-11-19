@@ -27,6 +27,13 @@ namespace VTT_SHOP_API.Controllers
             return HandleResult(result);
         }
 
+        [HttpGet("get-all-paged")]
+        public async Task<IActionResult> GetAllProductsPaged([FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10)
+        {
+            var result = await _product.GetProductsPagedAsync(pageIndex, pageSize);
+            return HandleResult(result);
+        }
+
 
         [HttpGet("search-product")]
         public async Task<IActionResult> SearchProduct([FromQuery] string name)
