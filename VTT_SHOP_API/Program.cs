@@ -1,4 +1,4 @@
-using VTT_SHOP_SHARED.DTOs;
+﻿using VTT_SHOP_SHARED.DTOs;
 using VTT_SHOP_CORE.Services;
 using VTT_SHOP_CORE.Services.AuthService;
 using VTT_SHOP_DATABASE;
@@ -27,6 +27,16 @@ builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<JWTService>();
 builder.Services.AddScoped<VnPayService>();
 builder.Services.AddScoped<PaymentService>();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp",
+        policy =>
+        {
+            policy.AllowAnyOrigin() 
+                  .AllowAnyMethod()
+                  .AllowAnyHeader(); 
+        });
+});
 
 builder.Services.AddAuthentication(options =>
 {
@@ -60,14 +70,13 @@ builder.Services.AddSingleton(provider =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
 
-app.UseHttpsRedirection();
+app.UseSwagger();
+app.UseSwaggerUI();
+
+app.UseCors("AllowReactApp");
+
+//app.UseHttpsRedirection();
 
 app.UseAuthentication();
 
@@ -76,3 +85,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+//ngrok http https://localhost:7153 --host-header=localhost

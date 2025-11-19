@@ -38,6 +38,12 @@ namespace VTT_SHOP_CORE.Services
             return Result.Ok(_mapper.Map<ProductDTO>(product));
         }
 
+        public async Task<Result<List<ProductDTO>>> GetProductsPagedAsync(int pageIndex = 1, int pageSize = 10)
+        {
+            var products = await _product.GetProductsPagedAsync(pageIndex, pageSize);
+            return Result.Ok(_mapper.Map<List<ProductDTO>>(products));
+        }
+
         public async Task<Result<ProductDTO>> AddProductAsync(CreateProductDTO productDTO)
         {
             try

@@ -21,7 +21,12 @@ namespace VTT_SHOP_API.Controllers
 
             string redirectUrl = _paymentService.ProcessVnPayReturn(query);
 
-            return Redirect(redirectUrl);
+            return Ok(new
+            {
+                Message = "API vnpay_return processed. Kiem tra CSDL de xac nhan IPN.",
+                AttemptedRedirectUrl = redirectUrl,
+                PaymentStatus = query.ContainsKey("vnp_ResponseCode") ? query["vnp_ResponseCode"].ToString() : "Unknown"
+            });
         }
 
         [HttpGet("vnpay_ipn")]
